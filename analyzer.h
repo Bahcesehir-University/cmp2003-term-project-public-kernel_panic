@@ -1,6 +1,13 @@
 #pragma once
+
+#include <fstream>
+#include <sstream>
 #include <string>
+#include <sstream>
 #include <vector>
+#include <iostream>
+#include <unordered_map>
+#include <queue>
 
 struct ZoneCount {
     std::string zone;
@@ -14,6 +21,10 @@ struct SlotCount {
 };
 
 class TripAnalyzer {
+private:
+  std::unordered_map<std::string, int>  CounterMap;
+  std::unordered_map<std::string,int>ZoneBasedMap;
+
 public:
     // Parse Trips.csv, skip dirty rows, never crash
     void ingestFile(const std::string& csvPath);
