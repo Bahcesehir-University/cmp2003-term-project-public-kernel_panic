@@ -23,6 +23,7 @@ struct SlotCount {
 class TripAnalyzer {
 private:
   std::unordered_map<std::string, int>  CounterMap;
+  std::unordered_map<std::string,int>ZoneBasedMap;
 
 public:
     // Parse Trips.csv, skip dirty rows, never crash
