@@ -11,7 +11,7 @@
 
 void TripAnalyzer::ingestFile(const std::string& csvPath) {
   CounterMap.clear();
-   
+   ZoneBasedMap.clear();
     std::ifstream file(csvPath);
     if(!file.is_open()){
     
@@ -24,37 +24,34 @@ std::getline(file, line);
 
 
 
-
-    size_t CommaLocation = 0;
-    std::string TripID;
-    std::string PickupZoneID;
-    std::string DropoffZoneID;
-    std::string PickupDateTime;
-    std::string DistanceKm;
-    std::string FareAmount;
-    
  
  
 
     while(std::getline(file,line)){
 
 
-        int CommaCounter = 0;
-        for(int i = 0; i < line.length();i++){
-            if(line[i] == ','){
+size_t CommaLocation1 = line.find(',');
+size_t CommaLocation2 = line.find(',',CommaLocation1 + 1);
+size_t CommaLocation3 = line.find(',',CommaLocation2 + 1);
+size_t CommaLocation4 = line.find(',',CommaLocation3 + 1);
+size_t CommaLocation5 = line.find(',',CommaLocation4 + 1);
 
-            CommaCounter++;
-            }
-        } 
 
- if (CommaCounter != 5) {
+
+
+    std::string TripID =line.substr(0,CommaLocation1);
+    std::string PickupZoneID = line.substr(CommaLocation1 +1,CommaLocation2 - CommaLocation1 - 1);
+    std::string DropoffZoneID =line.substr(CommaLocation2 +1,CommaLocation3 - CommaLocation2 - 1);
+    std::string PickupDateTime=line.substr(CommaLocation3 +1,CommaLocation4 - CommaLocation3 - 1);
+    std::string DistanceKm=line.substr(CommaLocation4 +1,CommaLocation5 - CommaLocation4 - 1);
+    std::string FareAmount = line.substr(CommaLocation5 + 1);
+    
+
+ if (CommaLocation1==std::string::npos || CommaLocation2==std::string::npos || CommaLocation3==std::string::npos || CommaLocation4==std::string::npos || CommaLocation5==std::string::npos) {
  
     continue;
 }
 
-  CommaLocation = line.find(",");
-  TripID = line.substr(0, CommaLocation);
-  line = line.substr(CommaLocation + 1,line.length());
 
 
  if(TripID.empty()){
@@ -65,9 +62,6 @@ std::getline(file, line);
 
   
 
-  CommaLocation = line.find(",");
-  PickupZoneID = line.substr(0, CommaLocation);
-  line = line.substr(CommaLocation + 1,line.length());
  
 if(PickupZoneID.empty()){
 
@@ -77,9 +71,6 @@ if(PickupZoneID.empty()){
  
  
 
-  CommaLocation = line.find(",");
-  DropoffZoneID = line.substr(0, CommaLocation);
-  line = line.substr(CommaLocation + 1,line.length());
 
  if(DropoffZoneID.empty()){
 
@@ -89,9 +80,7 @@ if(PickupZoneID.empty()){
  
 
 
-  CommaLocation = line.find(",");
-  PickupDateTime = line.substr(0, CommaLocation);
-  line = line.substr(CommaLocation + 1,line.length());
+  
 
 if(PickupDateTime.length() < 16 ){
 
@@ -121,19 +110,14 @@ if(PickupDateTime.length() < 16 ){
 
 
 
-
-  CommaLocation = line.find(",");
-  DistanceKm = line.substr(0, CommaLocation);
-  line = line.substr(CommaLocation + 1,line.length());
+  
    if(DistanceKm.empty()){
 
     continue;
 }
 
 
-  CommaLocation = line.find(",");
-  FareAmount = line.substr(0, CommaLocation);
-  line = line.substr(CommaLocation + 1,line.length());
+  
 
  
  if(FareAmount.empty()){
@@ -167,6 +151,7 @@ std::string key = PickupZoneID + "|" + std::to_string(int_JustTheHour);
 
 
 CounterMap[key]++;
+ZoneBasedMap[PickupZoneID]++;
 
      }
 }
@@ -193,20 +178,10 @@ std::vector<ZoneCount> TripAnalyzer::topZones(int k) const {
 
 
 
-    std::unordered_map<std::string,int>ZoneBasedMap;
+   
 
  
-    for (auto i = CounterMap.begin(); i != CounterMap.end(); ++i) {
-
-    const std::string& key = i->first;
-    int count = i->second;
-
-    size_t  OrLocation = key.find('|');
-    std::string zone = key.substr(0, OrLocation);
-
-
-    ZoneBasedMap[zone] += count;
-}
+   
     
 
  std::priority_queue<ZoneCount, std::vector<ZoneCount>, ZoneCmp> heap;
